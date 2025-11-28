@@ -1,5 +1,4 @@
-from sqlalchemy import SQLAlchemy
-from database.db import Base
+from app.database.db import Base
 import uuid
 from sqlalchemy import Column, String, Text, DateTime, Boolean, Enum, Integer, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
@@ -23,21 +22,26 @@ class PollStatus(str, enum.Enum):
 
 class Polls(Base):
     __tablename__ = "polls"
-    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4))
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    url = Column(String(8), unique=True, nullable=False)
     title = Column(String(255), nullable=False)
     description = Column(String(255), nullable=True)
-    author_id = Column(String(36))
-    type = Column(Enum(PollType), default=PollType.single)
-    start_time = Column(DateTime, nullable=True)
-    end_time = Column(DateTime, nullable=True)
-    status = Column(Enum(PollStatus), default=None)
+
+    author_id = Column(String(36), nullable=False)
+    type = Column(Enum(PollType), nullable=False, default=PollType.single)
+    status = Column(Enum(PollStatus), nullable=False, default=PollStatus.draft)
+
     allow_anonymous = Column(Boolean, default=True)
     allow_change_vote = Column(Boolean, default=False)
     max_choices = Column(Integer, nullable=True)
+
+    start_time = Column(DateTime, nullable=True)
+    end_time = Column(DateTime, nullable=True)
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship
     options = relationship("PollOption", back_populates="poll", cascade="all, delete-orphan")
 
 
@@ -45,10 +49,11 @@ class PollOption(Base):
     __tablename__ = "poll_options"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    poll_id = Column(String(36), ForeignKey("polls.id", ondelete="CASCADE"), nullable=False)
+    poll_id = Column(String(36), ForeignKey("polls.id", ondelete="CASCADE"))
     text = Column(String(255), nullable=False)
     order = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    poll = relationship("Poll", back_populates="options")
+    poll = relationship("Polls", back_populates="options")
+
 

@@ -16,37 +16,48 @@ class PollStatus(str, Enum):
     active = "active"
     closed = "closed"
 
-# Option schema
 class PollOptionSchema(BaseModel):
     text: str
     order: Optional[int] = None
 
-# Poll create schema
+
+class PollOptionResponseSchema(PollOptionSchema):
+    id: str
+
+    class Config:
+        from_attributes = True
+
+
 class PollCreateSchema(BaseModel):
     title: str
     description: Optional[str] = None
     author_id: str
+
     type: PollType = PollType.single
     status: PollStatus = PollStatus.draft
-    allow_anonymous: Optional[bool] = True
-    allow_change_vote: Optional[bool] = False
+
+    allow_anonymous: bool = True
+    allow_change_vote: bool = False
     max_choices: Optional[int] = None
-    options: Optional[List[PollOptionSchema]] = []
 
-# Poll update schema
+    options: List[PollOptionSchema] = Field(default_factory=list)
+
+
 class PollUpdateSchema(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
-    type: Optional[PollType]
-    status: Optional[PollStatus]
-    allow_anonymous: Optional[bool]
-    allow_change_vote: Optional[bool]
-    max_choices: Optional[int]
-    options: Optional[List[PollOptionSchema]]
+    title: Optional[str] = None
+    description: Optional[str] = None
+    type: Optional[PollType] = None
+    status: Optional[PollStatus] = None
+    allow_anonymous: Optional[bool] = None
+    allow_change_vote: Optional[bool] = None
+    max_choices: Optional[int] = None
 
-# Poll response schema
+    options: Optional[List[PollOptionSchema]] = None
+
+
 class PollResponseSchema(BaseModel):
     id: str
+    url: str
     title: str
     description: Optional[str]
     author_id: str
@@ -55,9 +66,10 @@ class PollResponseSchema(BaseModel):
     allow_anonymous: bool
     allow_change_vote: bool
     max_choices: Optional[int]
-    options: List[PollOptionSchema] = []
     created_at: datetime
     updated_at: datetime
 
+    options: List[PollOptionResponseSchema]
+
     class Config:
-        orm_mode = True
+        from_attributes = True

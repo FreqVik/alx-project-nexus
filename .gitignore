@@ -1,4 +1,20 @@
+# Python compilation
 __pycache__
-.env/
+
+# Virtual Environments
 env/
-poll-service/env/
+venv/
+.venv/
+
+# Environment Variables (Remove trailing slash to match files)
+.env
+.env.example
+poll-service/.env
+vote-service/.env
+
+# Databases
+*.db
+*.sqlite3
+
+# OS specific
+.DS_Store

@@ -1,5 +1,6 @@
 fastapi
 uvicorn
 alembic
-rabbitmq
+pika
 sqlalchemy
+pydantic-settings

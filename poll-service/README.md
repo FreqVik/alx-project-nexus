@@ -204,16 +204,177 @@ These events are consumed by:
 
 ---
 
+## 📡 Event Publishing
+
+The Poll Service publishes domain events to RabbitMQ for inter-service communication:
+
+### Published Events
+
+#### 1. `poll.created`
+Published when a new poll is created.
+
+```json
+{
+  "event_type": "poll.created",
+  "timestamp": "2025-11-21T10:30:00Z",
+  "poll_id": "uuid",
+  "title": "Best Programming Language?",
+  "description": "Vote for your favorite",
+  "author_id": "user-uuid",
+  "type": "single",
+  "status": "draft",
+  "allow_anonymous": true,
+  "allow_change_vote": false,
+  "max_choices": null,
+  "options": [
+    {"id": "opt-1", "text": "Python", "order": 0},
+    {"id": "opt-2", "text": "JavaScript", "order": 1}
+  ]
+}
+```
+
+#### 2. `poll.updated`
+Published when poll metadata is updated.
+
+```json
+{
+  "event_type": "poll.updated",
+  "timestamp": "2025-11-21T10:35:00Z",
+  "poll_id": "uuid",
+  "title": "Best Programming Language?",
+  "author_id": "user-uuid",
+  "type": "single",
+  "status": "active",
+  "description": "Updated description",
+  "updated_fields": ["description", "status"]
+}
+```
+
+#### 3. `poll.started`
+Published when a poll status changes to `active`.
+
+```json
+{
+  "event_type": "poll.started",
+  "timestamp": "2025-11-21T10:40:00Z",
+  "poll_id": "uuid",
+  "title": "Best Programming Language?",
+  "author_id": "user-uuid",
+  "type": "single",
+  "status": "active",
+  "start_time": "2025-11-21T10:40:00Z"
+}
+```
+
+#### 4. `poll.closed`
+Published when a poll status changes to `closed`.
+
+```json
+{
+  "event_type": "poll.closed",
+  "timestamp": "2025-11-22T10:40:00Z",
+  "poll_id": "uuid",
+  "title": "Best Programming Language?",
+  "author_id": "user-uuid",
+  "type": "single",
+  "status": "closed",
+  "end_time": "2025-11-22T10:40:00Z",
+  "total_options": 4
+}
+```
+
+### Event Configuration
+
+Events are published to a RabbitMQ topic exchange (`poll_events`) with routing keys:
+- `poll.created`
+- `poll.updated`
+- `poll.started`
+- `poll.closed`
+
+Consumer services can subscribe using topic patterns like `poll.*` or `poll.created`.
+
+---
+
 ## ⚙️ Configuration
 
 Environment variables:
 
+```bash
+# Database
+DATABASE_URL=sqlite:///./polls.db
+# For PostgreSQL: postgresql://user:password@localhost:5432/polls_db
+
+# RabbitMQ
+RABBITMQ_HOST=localhost
+RABBITMQ_PORT=5672
+RABBITMQ_USER=guest
+RABBITMQ_PASSWORD=guest
+RABBITMQ_VHOST=/
+
+# Service
+SERVICE_PORT=8000
+LOG_LEVEL=INFO
 ```
-DATABASE_URL=
-SERVICE_PORT=
-BROKER_URL=
-LOG_LEVEL=
+
+Copy `.env.example` to `.env` and adjust values:
+
+```bash
+cp .env.example .env
 ```
+
+---
+
+## 🚀 Running the Service
+
+### Prerequisites
+
+- Python 3.12+
+- RabbitMQ server running (for event publishing)
+- PostgreSQL or SQLite
+
+### Local Development
+
+1. **Create virtual environment:**
+```bash
+python3 -m venv env
+source env/bin/activate  # On Windows: env\Scripts\activate
+```
+
+2. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
+
+3. **Set up environment:**
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. **Run database migrations:**
+```bash
+alembic upgrade head
+```
+
+5. **Start the service:**
+```bash
+uvicorn main:app --reload --port 8000
+```
+
+API available at `http://localhost:8000`
+
+API docs at `http://localhost:8000/docs`
+
+---
+
+## 📦 Dependencies
+
+- **FastAPI** - Modern web framework
+- **SQLAlchemy** - ORM for database operations
+- **Alembic** - Database migrations
+- **Pika** - RabbitMQ client for Python
+- **Pydantic** - Data validation and settings
+- **Uvicorn** - ASGI server
 
 ---
 
