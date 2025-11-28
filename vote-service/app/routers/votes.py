@@ -61,6 +61,11 @@ def get_results(poll_id: str, db: Session = Depends(get_db)):
     service = VoteService(db)
     return service.get_vote_results(poll_id)
 
+@router.get("/{poll_id}", response_model=List[VoteCountSchema])
+def get_vote_counts(poll_id: str, db: Session = Depends(get_db)):
+    service = VoteService(db)
+    return service.get_vote_results(poll_id)
+
 @router.websocket("/ws/{poll_id}")
 async def websocket_endpoint(websocket: WebSocket, poll_id: str, db: Session = Depends(get_db)):
     await manager.connect(websocket, poll_id)

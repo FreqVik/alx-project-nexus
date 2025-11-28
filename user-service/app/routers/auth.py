@@ -21,7 +21,7 @@ def register_user(user_data: UserCreateSchema, db: Session = Depends(get_db)):
     return service.create_user(user_data=user_data)
 
 
-@router.post("/login", response_model=TokenSchema)
+@router.post("/token", response_model=TokenSchema)
 def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
