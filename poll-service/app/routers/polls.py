@@ -4,21 +4,26 @@ from sqlalchemy.orm import Session
 from app.schemas.polls_schema import (
     PollCreateSchema,
     PollUpdateSchema,
-    PollResponseSchema
+    PollResponseSchema,
 )
 from app.services.poll_service import PollService
 from app.database.db import get_db
 from app.utils.url import get_poll_url
+from app.security import get_current_user
 
-router = APIRouter(
-    prefix="/polls",
-    tags=["Polls"]
-)
+router = APIRouter(prefix="/polls", tags=["Polls"])
 
 
 @router.post("/", response_model=PollResponseSchema)
-def create_poll(payload: PollCreateSchema, request: Request, db: Session = Depends(get_db)):
+def create_poll(
+    payload: PollCreateSchema,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(get_current_user),
+):
     service = PollService(db)
+    # Assign the authenticated user's ID to the poll
+    payload.author_id = current_user
     poll = service.create_poll(payload)
     poll.url = get_poll_url(request, poll.url)
     return poll
