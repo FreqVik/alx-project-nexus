@@ -12,9 +12,6 @@ venv/
 poll-service/.env
 vote-service/.env
 
-# Databases
-*.db
-*.sqlite3
 
 # OS specific
 .DS_Store

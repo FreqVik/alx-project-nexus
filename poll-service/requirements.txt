@@ -4,4 +4,4 @@ alembic
 pika
 sqlalchemy
 pydantic-settings
-jose
+python-jose
