@@ -5,3 +5,4 @@ python-dotenv
 websockets
 pydantic-settings
 python-multipart
+python-dotenv
