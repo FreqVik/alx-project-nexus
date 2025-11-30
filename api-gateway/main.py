@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordBearer
 from app.routers import users, polls, votes
 
-app = FastAPI(title="API Gateway")
+app = FastAPI(title="UVote Backend API")
 
 # Include the routers for each service
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/token")
